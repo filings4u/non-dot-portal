@@ -11,7 +11,7 @@
     managementReadFunction:"nondot-management-read",
     managementWriteFunction:"nondot-management-actions",
     extendedWriteFunction:"nondot-management-actions",
-    portalAccessFunction:"workforce-ctpa-portal-access-admin",
+    portalAccessFunction:"nondot-portal-control",
     storageKey:"s4u-nondot-management-session"
   });
   window.NONDOT_PORTAL_CONFIG=config;
