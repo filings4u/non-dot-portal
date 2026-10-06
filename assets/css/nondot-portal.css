@@ -280,7 +280,7 @@ body{
   min-width:0;
 }
 
-/* DOT Programs directory */
+/* NON-DOT Programs management directory */
 .program-admin-page .nd-program-directory{margin-top:15px}
 .program-admin-page .nd-program-filters{padding-top:12px;padding-bottom:12px;border-bottom:1px solid var(--nd-line-soft)}
 .program-admin-page .nd-filter-row{display:grid;grid-template-columns:minmax(300px,1fr) 210px 180px;gap:10px;align-items:center}
@@ -295,11 +295,11 @@ body{
 @media(max-width:900px){.program-admin-page .nd-filter-row{grid-template-columns:1fr 1fr}.program-admin-page .nd-filter-row input{grid-column:1/-1}.program-admin-page .nd-table{min-width:1040px}}
 @media(max-width:620px){.program-admin-page .nd-filter-row{grid-template-columns:1fr}.program-admin-page .nd-filter-row input{grid-column:auto}}
 
-/* DOT Programs — company ownership details */
+/* NON-DOT Programs — company ownership details */
 .nd-program-company{min-width:260px;display:flex;flex-direction:column;gap:3px;line-height:1.25}.nd-program-company>strong{color:#0b356d}.nd-program-company>small{display:block;color:#607796;font-size:11px}.nd-program-company .nd-muted-id{color:#8797ac;font-size:10px;word-break:break-all}.program-admin-page .nd-program-directory .nd-table th:nth-child(3){min-width:290px}
 
 
-/* DOT Testing Orders directory — compact desktop layout */
+/* NON-DOT Testing Orders directory — compact desktop layout */
 .testing-admin-page .nd-program-directory{margin-top:15px}
 .testing-admin-page .nd-program-filters{padding:12px 17px;border-bottom:1px solid var(--nd-line-soft)}
 .testing-admin-page .nd-filter-row{display:grid;grid-template-columns:minmax(280px,1fr) 170px 160px 170px;gap:10px;align-items:center}
@@ -330,13 +330,13 @@ body{
 @media(max-width:1150px){.testing-admin-page .nd-filter-row{grid-template-columns:1fr 1fr}.testing-admin-page .nd-filter-row input{grid-column:1/-1}.testing-admin-page .nd-table{min-width:1120px}}
 @media(max-width:620px){.testing-admin-page .nd-filter-row{grid-template-columns:1fr}.testing-admin-page .nd-filter-row input{grid-column:auto}.testing-admin-page .nd-program-filters{padding:12px 14px}}
 
-/* DOT testing orders: resolved test subject */
+/* NON-DOT testing orders: resolved test subject */
 .testing-admin-page .nd-test-person{display:grid;gap:3px;min-width:150px}
 .testing-admin-page .nd-test-person strong{color:#082f63;font-weight:800;line-height:1.25}
 .testing-admin-page .nd-test-person small{display:block;color:#617796;line-height:1.35;overflow-wrap:anywhere}
 .testing-admin-page .nd-test-person .nd-muted-id{font-size:10px;color:#8392a8}
 
-/* DOT Testing Orders — filter alignment fix */
+/* NON-DOT Testing Orders — filter alignment fix */
 @media (min-width: 1160px){
   .testing-admin-page .nd-program-filters .nd-filter-row{
     display:grid;
@@ -353,7 +353,7 @@ body{
   }
 }
 
-/* DOT Testing Orders — final desktop status/action alignment */
+/* NON-DOT Testing Orders — final desktop status/action alignment */
 .testing-admin-page .nd-table th:nth-child(1){width:8%}
 .testing-admin-page .nd-table th:nth-child(2){width:14%}
 .testing-admin-page .nd-table th:nth-child(3){width:9%}
@@ -392,7 +392,7 @@ body{
 }
 
 
-/* DOT Testing Orders — fit full directory inside desktop viewport */
+/* NON-DOT Testing Orders — fit full directory inside desktop viewport */
 .testing-admin-page .nd-program-directory{min-width:0;max-width:100%;overflow:hidden}
 .testing-admin-page .nd-program-directory .nd-table-wrap{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
 .testing-admin-page .nd-program-directory .nd-table{width:100%;min-width:0!important;max-width:100%;table-layout:fixed}

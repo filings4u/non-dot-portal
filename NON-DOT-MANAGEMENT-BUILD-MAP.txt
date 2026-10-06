@@ -1,0 +1,34 @@
+WORKFORCE NON-DOT MANAGEMENT PORTAL
+
+Baseline management build
+
+Every operational route is a management workspace.
+
+Overview: nondot-dashboard.html
+Website content: nondot-website.html
+Portal control: nondot-portal-control.html
+C/TPAs: nondot-ctpas.html
+Employers: nondot-employers.html
+People: nondot-people.html
+Users & Access: nondot-users-access.html
+Programs: nondot-programs.html
+Pools: nondot-pools.html
+Random Selections: nondot-selections.html
+Testing Orders: nondot-testing.html
+Results: nondot-results.html
+Compliance: nondot-compliance.html
+Documents: nondot-documents.html
+Services: nondot-services.html
+Billing: nondot-billing.html
+Reports: nondot-reports.html
+Notifications: nondot-notifications.html
+Integrations: nondot-integrations.html
+Support: nondot-support.html
+Staff: nondot-staff.html
+Settings: nondot-settings.html
+
+Branding
+images/workforce-non-dot.png
+images/workforce-non-dot2.png
+
+No DOT management HTML pages or DOT JavaScript files are included in this package.
