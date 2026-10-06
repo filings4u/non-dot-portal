@@ -44,7 +44,96 @@ const defs={
 };
 
 async function managementPage(d){$('#ndPageMount').innerHTML=shell(d.title,d.sub,d.add?button(d.add,'ndAdd'):button('Export CSV','ndExport',false));const b=$('#pageBody');b.innerHTML=toolbar()+`<div id="ndTableMount"><div class="nd-card"><div class="nd-card-body">Loading management records…</div></div></div>`;try{const data=await NONDOTApi.read(d.read);currentData=data;const rows=Array.isArray(data[d.key])?data[d.key]:[];const render=x=>{$('#ndTableMount').innerHTML=table(x,d.cols);$$('[data-manage]').forEach(el=>el.onclick=()=>d.edit(x[Number(el.dataset.manage)]))};render(rows);wireFilter(rows,render);$('#ndAdd')?.addEventListener('click',()=>d.edit(null));$('#ndExport')?.addEventListener('click',()=>exportCsv(rows,`${d.read}-export.csv`))}catch(e){b.innerHTML=`<div class="nd-alert danger">${esc(e.message)}</div>`}}
-async function dashboard(){const m=$('#ndPageMount');m.innerHTML=shell('NON-DOT Management Overview','Operational overview with direct links into each management workspace.');const b=$('#pageBody');try{const d=await NONDOTApi.read('overview'),x=d.metrics||{};const modules=[['C/TPAs','nondot-ctpas.html','Manage C/TPA accounts'],['Employers','nondot-employers.html','Manage employer accounts'],['People','nondot-people.html','Manage employees'],['Programs','nondot-programs.html','Manage testing programs'],['Pools','nondot-pools.html','Manage random pools'],['Testing','nondot-testing.html','Manage testing orders'],['Results','nondot-results.html','Manage results'],['Support','nondot-support.html','Manage support tickets']];b.innerHTML=`<div class="nd-metrics"><article class="nd-metric"><span>C/TPAs</span><strong>${x.ctpas||0}</strong></article><article class="nd-metric"><span>Employers</span><strong>${x.employers||0}</strong></article><article class="nd-metric"><span>People</span><strong>${x.employees||0}</strong></article><article class="nd-metric"><span>Testing Orders</span><strong>${x.testing_orders||0}</strong></article></div><div class="nd-card"><div class="nd-card-head"><div><h2>Management Workspaces</h2><p>Every link opens an operational management page.</p></div></div><div class="nd-card-body"><div class="nd-module-grid">${modules.map(x=>`<a class="nd-module" href="${x[1]}"><b>${x[0]}</b><span>${x[2]} →</span></a>`).join('')}</div></div></div>`}catch(e){b.innerHTML=`<div class="nd-alert danger">${esc(e.message)}</div>`}}
+async function dashboard(){
+ const m=$('#ndPageMount');
+ m.innerHTML=shell('NON-DOT Management Dashboard','Executive overview of non-dot.screenings4u.com, NON-DOT customer portals, employers, people, programs, testing, compliance, billing, and support.',`<a class="nd-btn primary" href="nondot-portal-control.html">Portal Control</a><a class="nd-btn" href="nondot-website.html">NON-DOT Website</a><a class="nd-btn" href="nondot-reports.html">Reports</a>`);
+ const b=$('#pageBody');
+ try{
+   const settled=await Promise.allSettled([
+     NONDOTApi.read('overview'),
+     NONDOTApi.read('support'),
+     NONDOTApi.read('results'),
+     NONDOTApi.read('notifications'),
+     NONDOTApi.read('portal_control')
+   ]);
+   const value=i=>settled[i]?.status==='fulfilled'?(settled[i].value||{}):{};
+   const overview=value(0), supportData=value(1), resultsData=value(2), notificationsData=value(3), portalData=value(4);
+   const failures=settled.filter(x=>x.status==='rejected').length;
+   const x=overview.metrics||{};
+   const ctpas=overview.ctpas||[], employers=overview.employers||[], people=overview.people||overview.employees||[], programs=overview.programs||[], pools=overview.pools||[], orders=overview.testing_orders||[], compliance=overview.compliance_cases||[], subscriptions=overview.subscriptions||[];
+   const tickets=supportData.support_tickets||[], results=resultsData.test_results||[], notifications=notificationsData.notifications||[], access=portalData.portal_access||[];
+   const activeEmployers=employers.filter(r=>!r.archived_at&&!['inactive','archived'].includes(String(r.status||'').toLowerCase())).length;
+   const activePeople=people.filter(r=>!r.archived_at&&!['inactive','terminated'].includes(String(r.employment_status||'').toLowerCase())).length;
+   const openTests=orders.filter(r=>!['completed','complete','cancelled','canceled'].includes(String(r.status||'').toLowerCase())).length;
+   const openCompliance=compliance.filter(r=>!['resolved','closed','complete','completed'].includes(String(r.status||'').toLowerCase())).length;
+   const openSupport=tickets.filter(r=>!['resolved','closed'].includes(String(r.status||'').toLowerCase())).length;
+   const activeSubs=subscriptions.filter(r=>['active','trialing'].includes(String(r.status||'').toLowerCase())).length;
+   const enabledPortals=access.filter(r=>r.enabled!==false).length;
+   const queuedNotifications=notifications.filter(r=>['queued','pending'].includes(String(r.status||'').toLowerCase())).length;
+   const health=failures===0;
+   const operations=[
+     ['C/TPAs',ctpas.length,'nondot-ctpas.html','Manage NON-DOT C/TPA accounts, status, contacts, and customer relationships.'],
+     ['Employers',employers.length,'nondot-employers.html','Manage direct and C/TPA-sponsored NON-DOT employers.'],
+     ['People',people.length,'nondot-people.html','Maintain employee records, employment status, and employer assignments.'],
+     ['Programs',programs.length,'nondot-programs.html','Manage NON-DOT testing programs and employer program configuration.'],
+     ['Pools',pools.length,'nondot-pools.html','Manage random pools, ownership, and pool membership.'],
+     ['Open Testing',openTests,'nondot-testing.html','Testing orders that still need operational action.'],
+     ['Results',results.length,'nondot-results.html','Review and manage NON-DOT result records.'],
+     ['Compliance',openCompliance,'nondot-compliance.html','Open compliance cases and corrective-action work.'],
+     ['Support',openSupport,'nondot-support.html','Customer support tickets requiring attention.'],
+     ['Billing',activeSubs,'nondot-billing.html','Subscriptions and customer billing management.'],
+     ['Portal Access',enabledPortals,'nondot-portal-control.html','Control customer access to NON-DOT portals.'],
+     ['Reports',orders.length+results.length,'nondot-reports.html','Operational testing, results, and audit exports.']
+   ];
+   const recentOrders=[...orders].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,5);
+   const recentTickets=[...tickets].sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0)).slice(0,5);
+   const orderRows=recentOrders.map(r=>`<tr><td><strong>${esc(r.order_number||String(r.id||'').slice(0,8)||'Order')}</strong><small>${esc(r.reason||r.test_type||'NON-DOT testing')}</small></td><td>${status(r.status)}</td><td>${fmtDate(r.created_at)}</td><td><a class="nd-btn nd-btn-small" href="nondot-testing.html">Manage</a></td></tr>`).join('');
+   const ticketRows=recentTickets.map(r=>`<tr><td><strong>${esc(r.ticket_number||String(r.id||'').slice(0,8)||'Ticket')}</strong><small>${esc(r.subject||r.category||'Support')}</small></td><td>${status(r.status)}</td><td>${esc(r.priority||'normal')}</td><td><a class="nd-btn nd-btn-small" href="nondot-support.html">Manage</a></td></tr>`).join('');
+   b.innerHTML=`
+   <div class="nd-banner ${health?'':'warning'}"><div><strong>${health?'NON-DOT management overview is live':'NON-DOT management overview loaded with partial data'}</strong><span>${health?'Website, portal access, operations, testing, compliance, support, and billing data are connected.':`${failures} dashboard data source${failures===1?'':'s'} did not answer. Available management sections are still shown.`}</span></div>${status(health?'Live':'Partial')}</div>
+   <div class="nd-metrics nd-dashboard-metrics">
+     <article class="nd-metric"><span>C/TPAs</span><strong>${ctpas.length}</strong><small>NON-DOT C/TPA accounts</small></article>
+     <article class="nd-metric"><span>Employers</span><strong>${activeEmployers}</strong><small>${employers.length} total employer records</small></article>
+     <article class="nd-metric"><span>People</span><strong>${activePeople}</strong><small>${people.length} total people records</small></article>
+     <article class="nd-metric"><span>Open Testing</span><strong>${openTests}</strong><small>${orders.length} total testing orders</small></article>
+     <article class="nd-metric"><span>Open Compliance</span><strong>${openCompliance}</strong><small>Cases needing review</small></article>
+     <article class="nd-metric"><span>Open Support</span><strong>${openSupport}</strong><small>Unresolved support tickets</small></article>
+     <article class="nd-metric"><span>Active Subscriptions</span><strong>${activeSubs}</strong><small>NON-DOT customer billing</small></article>
+     <article class="nd-metric"><span>Portal Access</span><strong>${enabledPortals}</strong><small>Enabled portal access records</small></article>
+   </div>
+   <div class="nd-grid nd-dashboard-grid">
+     <article class="nd-card half nd-property-card">
+       <div class="nd-card-head"><div><h2>NON-DOT Website</h2><p>Public website management for non-dot.screenings4u.com.</p></div>${status('Active')}</div>
+       <div class="nd-card-body"><div class="nd-property-domain">non-dot.screenings4u.com</div><div class="nd-property-stats"><div><strong>Website</strong><span>content & publishing</span></div><div><strong>${programs.length}</strong><span>program records</span></div><div><strong>${employers.length}</strong><span>employer accounts</span></div></div><div class="nd-inline-actions"><a class="nd-btn primary" href="nondot-website.html">Manage Website</a><a class="nd-btn" href="https://non-dot.screenings4u.com" target="_blank" rel="noopener">Open Live</a></div></div>
+     </article>
+     <article class="nd-card half nd-property-card">
+       <div class="nd-card-head"><div><h2>NON-DOT Portal Network</h2><p>Access and account management for NON-DOT customer portals.</p></div>${status(enabledPortals?'Active':'Attention')}</div>
+       <div class="nd-card-body"><div class="nd-property-domain">Customer portal control</div><div class="nd-property-stats"><div><strong>${enabledPortals}</strong><span>enabled access</span></div><div><strong>${ctpas.length}</strong><span>C/TPAs</span></div><div><strong>${employers.length}</strong><span>employers</span></div></div><div class="nd-inline-actions"><a class="nd-btn primary" href="nondot-portal-control.html">Portal Control</a><a class="nd-btn" href="nondot-users-access.html">Users & Access</a></div></div>
+     </article>
+     <article class="nd-card">
+       <div class="nd-card-head"><div><h2>Operations Overview</h2><p>Jump directly into each NON-DOT management area.</p></div></div>
+       <div class="nd-card-body"><div class="nd-dashboard-action-grid">${operations.map(([label,count,href,copy])=>`<a class="nd-dashboard-action" href="${href}"><span class="nd-dashboard-action-count">${esc(String(count))}</span><b>${esc(label)}</b><small>${esc(copy)}</small><span class="nd-dashboard-action-link">Manage →</span></a>`).join('')}</div></div>
+     </article>
+     <article class="nd-card half">
+       <div class="nd-card-head"><div><h2>Current Attention</h2><p>Items that may need management review.</p></div></div>
+       <div class="nd-card-body"><div class="nd-attention-grid"><a href="nondot-support.html"><span>Open support</span><strong>${openSupport}</strong></a><a href="nondot-compliance.html"><span>Open compliance</span><strong>${openCompliance}</strong></a><a href="nondot-testing.html"><span>Open testing</span><strong>${openTests}</strong></a><a href="nondot-notifications.html"><span>Queued notifications</span><strong>${queuedNotifications}</strong></a></div></div>
+     </article>
+     <article class="nd-card half">
+       <div class="nd-card-head"><div><h2>Management Coverage</h2><p>Current NON-DOT control-plane coverage.</p></div></div>
+       <div class="nd-card-body"><div class="nd-kpi-list"><div class="nd-kpi-row"><span>NON-DOT C/TPAs</span><strong>${ctpas.length}</strong></div><div class="nd-kpi-row"><span>Employer accounts</span><strong>${employers.length}</strong></div><div class="nd-kpi-row"><span>People records</span><strong>${people.length}</strong></div><div class="nd-kpi-row"><span>Programs / pools</span><strong>${programs.length} / ${pools.length}</strong></div><div class="nd-kpi-row"><span>Testing / results</span><strong>${orders.length} / ${results.length}</strong></div></div></div>
+     </article>
+     <article class="nd-card half">
+       <div class="nd-card-head"><div><h2>Recent Testing Orders</h2><p>Latest NON-DOT testing activity.</p></div><a class="nd-card-head-link" href="nondot-testing.html">Manage all</a></div>
+       <div class="nd-table-wrap"><table class="nd-table"><thead><tr><th>Order</th><th>Status</th><th>Created</th><th></th></tr></thead><tbody>${orderRows||'<tr><td colspan="4"><div class="nd-empty">No testing orders found.</div></td></tr>'}</tbody></table></div>
+     </article>
+     <article class="nd-card half">
+       <div class="nd-card-head"><div><h2>Recent Support</h2><p>Latest NON-DOT support activity.</p></div><a class="nd-card-head-link" href="nondot-support.html">Manage all</a></div>
+       <div class="nd-table-wrap"><table class="nd-table"><thead><tr><th>Ticket</th><th>Status</th><th>Priority</th><th></th></tr></thead><tbody>${ticketRows||'<tr><td colspan="4"><div class="nd-empty">No support tickets found.</div></td></tr>'}</tbody></table></div>
+     </article>
+   </div>`;
+ }catch(e){b.innerHTML=`<div class="nd-alert danger">${esc(e.message)}</div>`}
+}
+
 async function portalControl(){const d={title:'Portal Control Management',sub:'Enable or disable NON-DOT C/TPA portal access.',read:'portal_control',key:'ctpas',cols:[['C/TPA',r=>`<strong>${esc(r.legal_name||r.id)}</strong>`],['Organization',r=>esc(r.organization_id||'—')],['Portal',()=>esc('ctpa_workforce')],['Access',r=>{const a=(currentData.portal_access||[]).find(x=>x.organization_id===r.organization_id&&x.portal_code==='ctpa_workforce');return status(a?.enabled?'Enabled':'Disabled')}]],edit:async r=>{const a=(currentData.portal_access||[]).find(x=>x.organization_id===r.organization_id&&x.portal_code==='ctpa_workforce');modal('Manage Portal Access',formHtml([field('enabled','C/TPA Portal Access',String(!!a?.enabled),'select',[{value:'true',label:'Enabled'},{value:'false',label:'Disabled'}])]),button('Save Access','ndSave'));$('#ndSave').onclick=()=>{const f=formData();return saveAndReload(()=>NONDOTApi.portalAccess('set',{ctpa_id:r.id,portal_code:'ctpa_workforce',enabled:f.enabled==='true'}))}}};return managementPage(d)}
 async function usersAccess(){const d={title:'User Access Management',sub:'Manage NON-DOT workforce memberships and customer access status.',read:'users_access',key:'memberships',cols:[['User',r=>`<strong>${esc(r.user_id)}</strong>`],['Organization',r=>esc(r.organization_id||'—')],['Primary',r=>esc(r.is_primary?'Yes':'No')],['Status',r=>status(r.status)]],edit:async r=>{modal('Manage User Access',formHtml([field('status','Status',r.status||'active','select',[{value:'active',label:'Active'},{value:'invited',label:'Invited'},{value:'inactive',label:'Inactive'}]),field('is_primary','Primary Membership',String(!!r.is_primary),'select',[{value:'false',label:'No'},{value:'true',label:'Yes'}])]),button('Save User Access','ndSave'));$('#ndSave').onclick=()=>{const f=formData();return saveAndReload(()=>NONDOTApi.extended('update_membership',{membership_id:r.id,status:f.status,is_primary:f.is_primary==='true'}))}}};return managementPage(d)}
 async function reports(){ $('#ndPageMount').innerHTML=shell('Report Management','Build and export NON-DOT operational reports.',button('Export Orders','ndExpOrders')+button('Export Results','ndExpResults',false));const b=$('#pageBody');try{const d=await NONDOTApi.read('reports');currentData=d;b.innerHTML=`<div class="nd-grid"><div class="nd-card half"><div class="nd-card-head"><div><h2>Testing Orders</h2><p>${(d.testing_orders||[]).length} records available</p></div></div><div class="nd-card-body">Use Export Orders to download the operational order register.</div></div><div class="nd-card half"><div class="nd-card-head"><div><h2>Test Results</h2><p>${(d.test_results||[]).length} records available</p></div></div><div class="nd-card-body">Use Export Results to download the current result register.</div></div></div>`;$('#ndExpOrders').onclick=()=>exportCsv(d.testing_orders||[],'nondot-testing-orders.csv');$('#ndExpResults').onclick=()=>exportCsv(d.test_results||[],'nondot-results.csv')}catch(e){b.innerHTML=`<div class="nd-alert danger">${esc(e.message)}</div>`}}
