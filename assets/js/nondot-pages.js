@@ -134,9 +134,121 @@ async function dashboard(){
  }catch(e){b.innerHTML=`<div class="nd-alert danger">${esc(e.message)}</div>`}
 }
 
+
+async function websiteManagement(){
+  $('#ndPageMount').innerHTML=shell(
+    'Website Management',
+    'Manage pages, pricing, redirects, SEO, and publishing for non-dot.screenings4u.com.',
+    `<a class="nd-btn" href="https://non-dot.screenings4u.com" target="_blank" rel="noopener">Open Live Site</a>${button('Refresh','ndWebsiteRefresh',false)}`
+  );
+  const b=$('#pageBody');
+  try{
+    const d=await NONDOTApi.read('website_management');
+    currentData=d;
+    const pages=d.pages||[], pricing=d.pricing||[], redirects=d.redirects||[], seo=d.seo||[], blog=d.blog_posts||[];
+    const publishedPages=pages.filter(x=>x.status==='published').length;
+    const activePricing=pricing.filter(x=>x.active!==false).length;
+    const activeRedirects=redirects.filter(x=>x.active!==false).length;
+    const publishedBlog=blog.filter(x=>x.status==='published').length;
+    b.innerHTML=`
+      <div class="nd-site-summary">
+        <article><span>Pages</span><strong>${pages.length}</strong><small>${publishedPages} published</small></article>
+        <article><span>Pricing</span><strong>${pricing.length}</strong><small>${activePricing} active offers</small></article>
+        <article><span>Redirects</span><strong>${redirects.length}</strong><small>${activeRedirects} active redirects</small></article>
+        <article><span>SEO</span><strong>${seo.length}</strong><small>site + page configurations</small></article>
+        <article><span>Blog</span><strong>${blog.length}</strong><small>${publishedBlog} published posts</small></article>
+      </div>
+      <div class="nd-site-control-card">
+        <div class="nd-site-tabs" role="tablist">
+          <button class="active" data-site-tab="pages" type="button">Pages</button>
+          <button data-site-tab="pricing" type="button">Pricing</button>
+          <button data-site-tab="redirects" type="button">URL Changes & Redirects</button>
+          <button data-site-tab="seo" type="button">SEO</button>
+          <button data-site-tab="blog" type="button">Blog & Content</button>
+        </div>
+        <div id="ndSitePanel"></div>
+      </div>`;
+
+    const panel=$('#ndSitePanel');
+    const editPage=async r=>{
+      const html=r?.content_json?.html||'';
+      modal(r?'Manage Website Page':'Add Website Page',formHtml([
+        field('title','Page Title',r?.title),field('slug','Slug',r?.slug),field('path','URL Path',r?.path||''),
+        field('page_type','Page Type',r?.page_type||'standard','select',[{value:'standard',label:'Standard'},{value:'landing',label:'Landing Page'},{value:'pricing',label:'Pricing Page'},{value:'legal',label:'Legal'}]),
+        field('status','Publishing Status',r?.status||'draft','select',[{value:'draft',label:'Draft'},{value:'published',label:'Published'},{value:'archived',label:'Archived'}]),
+        field('content_html','Page Content / HTML',html,'textarea'),field('seo_title','SEO Title',r?.seo_title),field('seo_description','Meta Description',r?.seo_description,'textarea'),
+        field('seo_keywords','SEO Keywords',Array.isArray(r?.seo_keywords)?r.seo_keywords.join(', '):''),field('canonical_url','Canonical URL',r?.canonical_url),
+        field('noindex','Search Indexing',String(!!r?.noindex),'select',[{value:'false',label:'Allow indexing'},{value:'true',label:'Noindex'}])
+      ]),`${button('Save Page','ndSiteSave')}${r?button('Archive Page','ndSiteArchive',false):''}`);
+      $('#ndSiteSave').onclick=()=>{const f=formData();f.noindex=f.noindex==='true';return saveAndReload(()=>NONDOTApi.write('save_website_page',{page:{...f,id:r?.id}}))};
+      if(r)$('#ndSiteArchive').onclick=()=>saveAndReload(()=>NONDOTApi.write('archive_website_page',{page_id:r.id}));
+    };
+    const editPricing=async r=>{
+      modal(r?'Manage Pricing':'Add Pricing',formHtml([
+        field('name','Name',r?.name),field('code','Code',r?.code),field('category','Category',r?.category||'general'),field('description','Description',r?.description,'textarea'),
+        field('amount','Amount',r?.amount,'number'),field('billing_period','Billing Period',r?.billing_period),field('active','Status',String(r?.active!==false),'select',[{value:'true',label:'Active'},{value:'false',label:'Inactive'}]),
+        field('sort_order','Sort Order',r?.sort_order||100,'number'),field('cta_label','CTA Label',r?.cta_label),field('cta_url','CTA URL',r?.cta_url),
+        field('features','Features (one per line)',Array.isArray(r?.features)?r.features.join('\n'):'','textarea')
+      ]),button('Save Pricing','ndSiteSave'));
+      $('#ndSiteSave').onclick=()=>{const f=formData();f.active=f.active==='true';return saveAndReload(()=>NONDOTApi.write('save_website_pricing',{pricing:{...f,id:r?.id}}))};
+    };
+    const editRedirect=async r=>{
+      modal(r?'Manage Redirect':'Add Redirect',formHtml([
+        field('source_path','Old URL / Source Path',r?.source_path),field('target_url','New URL / Destination',r?.target_url),
+        field('status_code','Redirect Type',String(r?.status_code||301),'select',[{value:'301',label:'301 Permanent'},{value:'302',label:'302 Temporary'},{value:'307',label:'307 Temporary'},{value:'308',label:'308 Permanent'}]),
+        field('active','Status',String(r?.active!==false),'select',[{value:'true',label:'Active'},{value:'false',label:'Inactive'}]),field('notes','Notes',r?.notes,'textarea')
+      ]),`${button('Save Redirect','ndSiteSave')}${r?button('Delete Redirect','ndSiteDelete',false):''}`);
+      $('#ndSiteSave').onclick=()=>{const f=formData();f.active=f.active==='true';return saveAndReload(()=>NONDOTApi.write('save_website_redirect',{redirect:{...f,id:r?.id}}))};
+      if(r)$('#ndSiteDelete').onclick=()=>{if(confirm('Delete this redirect?'))return saveAndReload(()=>NONDOTApi.write('delete_website_redirect',{redirect_id:r.id}))};
+    };
+    const editSeo=async r=>{
+      modal(r?'Manage SEO Configuration':'Add SEO Configuration',formHtml([
+        field('scope_type','SEO Scope',r?.scope_type||'site','select',[{value:'site',label:'Entire Site'},{value:'page',label:'Specific Page'}]),field('scope_key','Scope Key',r?.scope_key||'global'),
+        field('title_template','Title / Title Template',r?.title_template),field('meta_description','Meta Description',r?.meta_description,'textarea'),field('canonical_url','Canonical URL',r?.canonical_url),
+        field('robots_index','Allow Indexing',String(r?.robots_index!==false),'select',[{value:'true',label:'Index'},{value:'false',label:'Noindex'}]),field('robots_follow','Allow Link Following',String(r?.robots_follow!==false),'select',[{value:'true',label:'Follow'},{value:'false',label:'Nofollow'}]),
+        field('og_title','Social / OG Title',r?.og_title),field('og_description','Social / OG Description',r?.og_description,'textarea'),field('og_image_url','Social / OG Image URL',r?.og_image_url)
+      ]),button('Save SEO','ndSiteSave'));
+      $('#ndSiteSave').onclick=()=>{const f=formData();f.robots_index=f.robots_index==='true';f.robots_follow=f.robots_follow==='true';return saveAndReload(()=>NONDOTApi.write('save_website_seo',{seo:{...f,id:r?.id}}))};
+    };
+    const editBlog=async r=>{
+      modal(r?'Manage Blog Post':'Add Blog Post',formHtml([
+        field('title','Title',r?.title),field('slug','Slug',r?.slug),field('excerpt','Excerpt',r?.excerpt,'textarea'),field('content_html','Content HTML',r?.content_html,'textarea'),
+        field('author_name','Author Name',r?.author_name),field('status','Status',r?.status||'draft','select',[{value:'draft',label:'Draft'},{value:'published',label:'Published'},{value:'archived',label:'Archived'}]),
+        field('seo_title','SEO Title',r?.seo_title),field('seo_description','SEO Description',r?.seo_description,'textarea'),field('canonical_url','Canonical URL',r?.canonical_url)
+      ]),`${button('Save Post','ndSiteSave')}${r?button('Archive Post','ndSiteArchive',false):''}`);
+      $('#ndSiteSave').onclick=()=>saveAndReload(()=>NONDOTApi.write('save_blog_post',{post:{...formData(),id:r?.id}}));
+      if(r)$('#ndSiteArchive').onclick=()=>saveAndReload(()=>NONDOTApi.write('archive_blog_post',{post_id:r.id}));
+    };
+
+    function bindManage(rows,fn){$$('[data-site-manage]').forEach(btn=>btn.onclick=()=>fn(rows[Number(btn.dataset.siteManage)]));}
+    function renderTab(tab){
+      $$('.nd-site-tabs button').forEach(x=>x.classList.toggle('active',x.dataset.siteTab===tab));
+      if(tab==='pages'){
+        panel.innerHTML=`<div class="nd-site-panel-head"><div><h2>Pages</h2><p>Create, edit, publish, archive, and manage page-level SEO.</p></div>${button('Add Page','ndSiteAdd')}</div>${table(pages,[['Page',r=>`<strong>${esc(r.title)}</strong><small>${esc(r.path)}</small>`],['Type',r=>esc(r.page_type)],['Status',r=>status(r.status)],['SEO',r=>esc(r.noindex?'Noindex':'Index')]],'Manage')}`;
+        $('#ndSiteAdd').onclick=()=>editPage(null);$$('[data-manage]').forEach(btn=>{btn.dataset.siteManage=btn.dataset.manage;btn.removeAttribute('data-manage')});bindManage(pages,editPage);
+      }else if(tab==='pricing'){
+        panel.innerHTML=`<div class="nd-site-panel-head"><div><h2>Pricing</h2><p>Manage public plans, prices, CTA links, features, and display order.</p></div>${button('Add Pricing','ndSiteAdd')}</div>${table(pricing,[['Offer',r=>`<strong>${esc(r.name)}</strong><small>${esc(r.code)}</small>`],['Category',r=>esc(r.category)],['Amount',r=>r.amount==null?'—':`$${Number(r.amount).toFixed(2)}`],['Status',r=>status(r.active?'Active':'Inactive')]],'Manage')}`;
+        $('#ndSiteAdd').onclick=()=>editPricing(null);$$('[data-manage]').forEach(btn=>{btn.dataset.siteManage=btn.dataset.manage;btn.removeAttribute('data-manage')});bindManage(pricing,editPricing);
+      }else if(tab==='redirects'){
+        panel.innerHTML=`<div class="nd-site-panel-head"><div><h2>URL Changes & Redirects</h2><p>Manage permanent and temporary URL changes without losing traffic.</p></div>${button('Add Redirect','ndSiteAdd')}</div>${table(redirects,[['Source URL',r=>`<strong>${esc(r.source_path)}</strong>`],['Destination',r=>esc(r.target_url)],['Type',r=>esc(r.status_code)],['Status',r=>status(r.active?'Active':'Inactive')]],'Manage')}`;
+        $('#ndSiteAdd').onclick=()=>editRedirect(null);$$('[data-manage]').forEach(btn=>{btn.dataset.siteManage=btn.dataset.manage;btn.removeAttribute('data-manage')});bindManage(redirects,editRedirect);
+      }else if(tab==='seo'){
+        panel.innerHTML=`<div class="nd-site-panel-head"><div><h2>SEO</h2><p>Control indexing, metadata, canonicals, social previews, and page/site SEO.</p></div>${button('Add SEO Rule','ndSiteAdd')}</div>${table(seo,[['Scope',r=>`<strong>${esc(r.scope_type)}</strong><small>${esc(r.scope_key)}</small>`],['Title',r=>esc(r.title_template||'—')],['Index',r=>status(r.robots_index?'Index':'Noindex')],['Follow',r=>status(r.robots_follow?'Follow':'Nofollow')]],'Manage')}`;
+        $('#ndSiteAdd').onclick=()=>editSeo(null);$$('[data-manage]').forEach(btn=>{btn.dataset.siteManage=btn.dataset.manage;btn.removeAttribute('data-manage')});bindManage(seo,editSeo);
+      }else{
+        panel.innerHTML=`<div class="nd-site-panel-head"><div><h2>Blog & Content</h2><p>Create, edit, publish, archive, and optimize website content.</p></div>${button('Add Blog Post','ndSiteAdd')}</div>${table(blog,[['Post',r=>`<strong>${esc(r.title||r.id)}</strong><small>${esc(r.slug||'')}</small>`],['Author',r=>esc(r.author_name||'—')],['Status',r=>status(r.status)],['Published',r=>esc(fmtDate(r.published_at))]],'Manage')}`;
+        $('#ndSiteAdd').onclick=()=>editBlog(null);$$('[data-manage]').forEach(btn=>{btn.dataset.siteManage=btn.dataset.manage;btn.removeAttribute('data-manage')});bindManage(blog,editBlog);
+      }
+    }
+    $$('.nd-site-tabs button').forEach(x=>x.onclick=()=>renderTab(x.dataset.siteTab));
+    $('#ndWebsiteRefresh').onclick=()=>run();
+    renderTab((location.hash||'#pages').slice(1));
+  }catch(e){b.innerHTML=`<div class="nd-alert danger">${esc(e.message)}</div>`}
+}
+
 async function portalControl(){const d={title:'Portal Control Management',sub:'Enable or disable NON-DOT C/TPA portal access.',read:'portal_control',key:'ctpas',cols:[['C/TPA',r=>`<strong>${esc(r.legal_name||r.id)}</strong>`],['Organization',r=>esc(r.organization_id||'—')],['Portal',()=>esc('ctpa_workforce')],['Access',r=>{const a=(currentData.portal_access||[]).find(x=>x.organization_id===r.organization_id&&x.portal_code==='ctpa_workforce');return status(a?.enabled?'Enabled':'Disabled')}]],edit:async r=>{const a=(currentData.portal_access||[]).find(x=>x.organization_id===r.organization_id&&x.portal_code==='ctpa_workforce');modal('Manage Portal Access',formHtml([field('enabled','C/TPA Portal Access',String(!!a?.enabled),'select',[{value:'true',label:'Enabled'},{value:'false',label:'Disabled'}])]),button('Save Access','ndSave'));$('#ndSave').onclick=()=>{const f=formData();return saveAndReload(()=>NONDOTApi.portalAccess('set',{ctpa_id:r.id,portal_code:'ctpa_workforce',enabled:f.enabled==='true'}))}}};return managementPage(d)}
 async function usersAccess(){const d={title:'User Access Management',sub:'Manage NON-DOT workforce memberships and customer access status.',read:'users_access',key:'memberships',cols:[['User',r=>`<strong>${esc(r.user_id)}</strong>`],['Organization',r=>esc(r.organization_id||'—')],['Primary',r=>esc(r.is_primary?'Yes':'No')],['Status',r=>status(r.status)]],edit:async r=>{modal('Manage User Access',formHtml([field('status','Status',r.status||'active','select',[{value:'active',label:'Active'},{value:'invited',label:'Invited'},{value:'inactive',label:'Inactive'}]),field('is_primary','Primary Membership',String(!!r.is_primary),'select',[{value:'false',label:'No'},{value:'true',label:'Yes'}])]),button('Save User Access','ndSave'));$('#ndSave').onclick=()=>{const f=formData();return saveAndReload(()=>NONDOTApi.extended('update_membership',{membership_id:r.id,status:f.status,is_primary:f.is_primary==='true'}))}}};return managementPage(d)}
 async function reports(){ $('#ndPageMount').innerHTML=shell('Report Management','Build and export NON-DOT operational reports.',button('Export Orders','ndExpOrders')+button('Export Results','ndExpResults',false));const b=$('#pageBody');try{const d=await NONDOTApi.read('reports');currentData=d;b.innerHTML=`<div class="nd-grid"><div class="nd-card half"><div class="nd-card-head"><div><h2>Testing Orders</h2><p>${(d.testing_orders||[]).length} records available</p></div></div><div class="nd-card-body">Use Export Orders to download the operational order register.</div></div><div class="nd-card half"><div class="nd-card-head"><div><h2>Test Results</h2><p>${(d.test_results||[]).length} records available</p></div></div><div class="nd-card-body">Use Export Results to download the current result register.</div></div></div>`;$('#ndExpOrders').onclick=()=>exportCsv(d.testing_orders||[],'nondot-testing-orders.csv');$('#ndExpResults').onclick=()=>exportCsv(d.test_results||[],'nondot-results.csv')}catch(e){b.innerHTML=`<div class="nd-alert danger">${esc(e.message)}</div>`}}
-async function run(){if(file==='nondot-dashboard.html'||file==='index.html'||file==='')return dashboard();if(file==='nondot-portal-control.html')return portalControl();if(file==='nondot-users-access.html')return usersAccess();if(file==='nondot-reports.html')return reports();const d=defs[file];if(d)return managementPage(d);$('#ndPageMount').innerHTML=shell('NON-DOT Management','This management route is not configured.');$('#pageBody').innerHTML='<div class="nd-alert danger">This page needs a management definition.</div>'}
+async function run(){if(file==='nondot-dashboard.html'||file==='index.html'||file==='')return dashboard();if(file==='nondot-website.html')return websiteManagement();if(file==='nondot-portal-control.html')return portalControl();if(file==='nondot-users-access.html')return usersAccess();if(file==='nondot-reports.html')return reports();const d=defs[file];if(d)return managementPage(d);$('#ndPageMount').innerHTML=shell('NON-DOT Management','This management route is not configured.');$('#pageBody').innerHTML='<div class="nd-alert danger">This page needs a management definition.</div>'}
 window.addEventListener('nondot:authenticated',()=>{NONDOTShell.render(window.NONDOT_AUTH_STATE);run()},{once:true});NONDOTAuth.requireAuth();
 })();

@@ -9,7 +9,7 @@
     supabaseAnonKey:"sb_publishable_xVI6Mjkk1bNVMGHZCPuK6w_8FSHKdkC",
     staffContextFunction:"screenings4u-staff-context",
     managementReadFunction:"nondot-management-read",
-    managementWriteFunction:"workforce-enterprise-actions",
+    managementWriteFunction:"nondot-management-actions",
     extendedWriteFunction:"nondot-management-actions",
     portalAccessFunction:"workforce-ctpa-portal-access-admin",
     storageKey:"s4u-nondot-management-session"

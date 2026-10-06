@@ -1201,3 +1201,23 @@ body.nd-modal-open{overflow:hidden}
 @media(max-width:1180px){.nd-dashboard-action-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:900px){.nd-dashboard-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.nd-dashboard-action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nd-property-stats{grid-template-columns:1fr}.nd-card.half{grid-column:span 12}}
 @media(max-width:620px){.nd-dashboard-metrics{grid-template-columns:1fr}.nd-dashboard-action-grid{grid-template-columns:1fr}.nd-attention-grid{grid-template-columns:1fr}}
+
+/* NON-DOT website management control center */
+.nd-site-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.nd-site-summary article{background:#fff;border:1px solid var(--nd-line);border-radius:10px;padding:16px 17px;box-shadow:var(--nd-shadow)}
+.nd-site-summary span{display:block;color:var(--nd-muted);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+.nd-site-summary strong{display:block;margin-top:6px;color:var(--nd-blue);font-size:25px}
+.nd-site-summary small{display:block;margin-top:4px;color:var(--nd-muted);font-size:10px}
+.nd-site-control-card{background:#fff;border:1px solid var(--nd-line);border-radius:12px;box-shadow:var(--nd-shadow);overflow:hidden}
+.nd-site-tabs{display:flex;gap:0;overflow:auto;border-bottom:1px solid var(--nd-line);background:#f8fafc;padding:0 14px}
+.nd-site-tabs button{border:0;border-bottom:3px solid transparent;background:transparent;color:#5d6f86;padding:15px 16px 12px;font:inherit;font-size:11px;font-weight:900;white-space:nowrap;cursor:pointer}
+.nd-site-tabs button:hover{color:var(--nd-blue);background:#f2f6fb}
+.nd-site-tabs button.active{color:var(--nd-blue);border-bottom-color:var(--nd-orange);background:#fff}
+#ndSitePanel{padding:16px}
+.nd-site-panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+.nd-site-panel-head h2{margin:0;color:var(--nd-navy);font-size:18px}
+.nd-site-panel-head p{margin:4px 0 0;color:var(--nd-muted);font-size:11px}
+.nd-site-control-card .nd-card{box-shadow:none;border-radius:9px}
+.nd-site-control-card .nd-table small{display:block;margin-top:3px;color:var(--nd-muted);font-size:10px}
+@media(max-width:1100px){.nd-site-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.nd-site-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.nd-site-panel-head{align-items:stretch;flex-direction:column}.nd-site-panel-head .nd-btn{width:100%}}
