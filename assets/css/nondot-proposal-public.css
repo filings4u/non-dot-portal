@@ -29,3 +29,5 @@
   .proposal-meta-card{min-height:auto}
   .proposal-section,.proposal-company{padding-left:22px;padding-right:22px}
 }
+
+.proposal-custom-note{margin:20px 46px;padding:20px 22px!important;border:1px solid #f2c8aa!important;border-left:4px solid #f05a00!important;border-radius:10px;background:#fffaf6}.proposal-custom-note h2{color:#17365f}.proposal-custom-note p{color:#526b87}@media(max-width:780px){.proposal-custom-note{margin-left:24px;margin-right:24px}}@media(max-width:520px){.proposal-custom-note{margin-left:19px;margin-right:19px}}
