@@ -9,7 +9,7 @@ const groups=[
  ['Programs & Testing',[['nondot-programs.html','Programs','≡'],['nondot-pools.html','Pools','⊙'],['nondot-selections.html','Random Selections','⌁'],['nondot-testing.html','Testing Orders','✚'],['nondot-results.html','Results','✓']]],
  ['Compliance & Records',[['nondot-compliance.html','Compliance Cases','⚑'],['nondot-documents.html','Documents','▱'],['nondot-services.html','Services & Catalog','$']]],
  ['Commerce',[['nondot-billing.html','Billing','▧'],['nondot-reports.html','Reports','☷']]],
- ['Administration',[['nondot-notifications.html','Notifications','●'],['nondot-integrations.html','Integrations','⌘'],['nondot-support.html','Support','?'],['nondot-staff.html','Staff','♟'],['nondot-settings.html','Settings','⚙']]]
+ ['Administration',[['nondot-notifications.html','Notifications','●'],['nondot-integrations.html','Integrations','⌘'],['nondot-portal-domains.html','Portal Domains','◎'],['nondot-support.html','Support','?'],['nondot-staff.html','Staff','♟'],['nondot-settings.html','Settings','⚙']]]
 ];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const initials=v=>String(v||'ND').split(/\s+|@/).filter(Boolean).slice(0,2).map(x=>x[0]?.toUpperCase()).join('')||'ND';
