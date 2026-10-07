@@ -172,3 +172,11 @@
 @media(max-width:560px){.nd-proposal-pricing-row{grid-template-columns:1fr}.nd-proposal-pricing-item{grid-column:auto}.nd-proposal-price-total{grid-template-columns:1fr 125px!important}.nd-proposal-price-total input{width:125px!important;max-width:125px!important}}
 
 .nd-catalog-hidden{display:none!important}
+
+/* Proposal preview metadata spacing */
+.nd-preview-meta{gap:16px;margin:26px 0 28px}
+.nd-preview-meta>div{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:7px;padding:18px 16px;min-height:92px}
+.nd-preview-meta small{display:block;margin:0;font-size:10px;font-weight:800;line-height:1.25;letter-spacing:.04em;text-transform:uppercase;color:#6e7f94}
+.nd-preview-meta strong{display:block;margin:0;font-size:15px;font-weight:800;line-height:1.35;color:#17365f}
+.nd-preview-meta span{display:block;margin:0;font-size:13px;line-height:1.4;color:#536b86;overflow-wrap:anywhere}
+@media(max-width:1100px){.nd-preview-meta>div{min-height:0}}
