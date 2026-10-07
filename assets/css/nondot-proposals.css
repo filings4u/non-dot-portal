@@ -9,8 +9,6 @@
 .nd-proposal-section-head>input{flex:1 1 auto;width:100%;min-width:0;max-width:none;min-height:42px;padding:9px 11px;border:1px solid #cfd9e6;border-radius:8px;background:#fff;color:#17365f;font:inherit;font-weight:800}
 .nd-proposal-section-row>textarea{display:block;width:100%!important;max-width:none!important;min-width:0!important;min-height:170px;padding:12px 13px;border:1px solid #cfd9e6;border-radius:8px;background:#fff;color:#26384d;font:inherit;font-size:13px;line-height:1.62;resize:vertical}
 .nd-proposal-section-head>input:focus,.nd-proposal-section-row>textarea:focus{outline:none;border-color:#6f97ca;box-shadow:0 0 0 3px rgba(36,70,127,.08)}
-.nd-proposal-pricing-table{min-width:900px}
-.nd-proposal-pricing-table td:first-child{min-width:300px}
 .nd-proposal-item-name,.nd-proposal-item-desc{width:100%;max-width:none;min-width:0}
 .nd-proposal-item-name{min-height:38px;font-weight:800}
 .nd-proposal-item-desc{margin-top:6px;min-height:58px;resize:vertical}
@@ -34,3 +32,109 @@
 .nd-proposal-item-added{animation:proposalItemAdded 1.6s ease}
 @keyframes proposalItemAdded{0%,35%{background:#fff5e9;box-shadow:inset 4px 0 #f05a00}100%{background:transparent;box-shadow:none}}
 @media(max-width:1100px){.nd-proposal-section-row>textarea{min-height:150px}.nd-proposal-catalog-groups{max-height:520px}}
+
+/* Proposal pricing layout: keep the editor inside the card with no horizontal scrollbar. */
+.nd-proposal-editor-main .nd-card-body > .nd-table-wrap{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+  overflow-y:visible;
+}
+.nd-proposal-pricing-table{
+  width:100%;
+  min-width:0!important;
+  table-layout:fixed;
+}
+.nd-proposal-pricing-table th,
+.nd-proposal-pricing-table td{
+  min-width:0!important;
+  padding:10px 9px;
+  overflow-wrap:anywhere;
+}
+.nd-proposal-pricing-table th:nth-child(1),
+.nd-proposal-pricing-table td:nth-child(1){width:34%}
+.nd-proposal-pricing-table th:nth-child(2),
+.nd-proposal-pricing-table td:nth-child(2){width:14%}
+.nd-proposal-pricing-table th:nth-child(3),
+.nd-proposal-pricing-table td:nth-child(3){width:12%}
+.nd-proposal-pricing-table th:nth-child(4),
+.nd-proposal-pricing-table td:nth-child(4){width:15%}
+.nd-proposal-pricing-table th:nth-child(5),
+.nd-proposal-pricing-table td:nth-child(5){width:13%}
+.nd-proposal-pricing-table th:nth-child(6),
+.nd-proposal-pricing-table td:nth-child(6){width:12%}
+.nd-proposal-pricing-table input,
+.nd-proposal-pricing-table select,
+.nd-proposal-pricing-table textarea{
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0!important;
+  box-sizing:border-box;
+}
+.nd-proposal-pricing-table textarea{
+  resize:vertical;
+}
+.nd-proposal-pricing-table td:first-child{min-width:0!important}
+.nd-proposal-mini-field{display:grid;gap:4px;min-width:0}
+.nd-proposal-mini-field span{font-size:9px;line-height:1.2;color:#77899d;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+.nd-proposal-pricing-table [data-line]{display:block;white-space:nowrap}
+.nd-proposal-pricing-table .nd-btn-small{width:100%;padding-left:7px;padding-right:7px}
+
+.nd-proposal-price-total{
+  width:min(390px,100%);
+  margin:16px 0 0 auto;
+  padding:16px 0 0;
+  border-top:1px solid #e4ebf4;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 150px;
+  align-items:center;
+  gap:10px 18px;
+}
+.nd-proposal-price-total span{color:#405571}
+.nd-proposal-price-total strong{text-align:right;color:#17365f;font-size:18px;white-space:nowrap}
+.nd-proposal-price-total input{
+  width:150px;
+  max-width:100%;
+  min-width:0;
+  justify-self:end;
+  box-sizing:border-box;
+  text-align:right;
+}
+
+@media(max-width:760px){
+  .nd-proposal-editor-main .nd-card-body > .nd-table-wrap{overflow:visible}
+  .nd-proposal-pricing-table,
+  .nd-proposal-pricing-table thead,
+  .nd-proposal-pricing-table tbody,
+  .nd-proposal-pricing-table tr,
+  .nd-proposal-pricing-table th,
+  .nd-proposal-pricing-table td{display:block;width:100%!important}
+  .nd-proposal-pricing-table thead{display:none}
+  .nd-proposal-pricing-table tr{padding:12px 0;border-bottom:1px solid #e4ebf4}
+  .nd-proposal-pricing-table td{border:0;padding:6px 0}
+  .nd-proposal-price-total{grid-template-columns:1fr 130px}
+  .nd-proposal-price-total input{width:130px}
+}
+
+/* Proposal pricing hard override — no horizontal scrollbar */
+.nd-proposal-editor-main .nd-card-body>.nd-table-wrap{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:hidden!important;
+  overflow-y:visible!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+.nd-proposal-editor-main .nd-card-body>.nd-table-wrap::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+.nd-proposal-pricing-table{width:100%!important;max-width:100%!important;min-width:0!important;table-layout:fixed!important}
+.nd-proposal-pricing-table th,.nd-proposal-pricing-table td{box-sizing:border-box!important;min-width:0!important;max-width:none!important}
+.nd-proposal-pricing-table th:nth-child(1),.nd-proposal-pricing-table td:nth-child(1){width:36%!important}
+.nd-proposal-pricing-table th:nth-child(2),.nd-proposal-pricing-table td:nth-child(2){width:14%!important}
+.nd-proposal-pricing-table th:nth-child(3),.nd-proposal-pricing-table td:nth-child(3){width:11%!important}
+.nd-proposal-pricing-table th:nth-child(4),.nd-proposal-pricing-table td:nth-child(4){width:15%!important}
+.nd-proposal-pricing-table th:nth-child(5),.nd-proposal-pricing-table td:nth-child(5){width:14%!important}
+.nd-proposal-pricing-table th:nth-child(6),.nd-proposal-pricing-table td:nth-child(6){width:10%!important}
+.nd-proposal-price-total{box-sizing:border-box!important;grid-template-columns:minmax(120px,1fr) 145px!important;column-gap:20px!important}
+.nd-proposal-price-total input{width:145px!important;min-width:0!important}
