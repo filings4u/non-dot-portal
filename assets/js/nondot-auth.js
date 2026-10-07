@@ -1,7 +1,7 @@
 /* screenings4u Workforce NON-DOT Management Portal — staff auth */
 (()=>{
 "use strict";
-const CACHE_KEY='s4u-nondot-auth-context-v1',CACHE_MS=60*60*1000;
+const CACHE_KEY='s4u-nondot-auth-context-v1',CACHE_MS=2*60*1000;
 const client=()=>{if(!window.nondotSupabase?.auth)throw new Error('NON-DOT Supabase client is unavailable.');return window.nondotSupabase};
 function readCache(uid){try{const x=JSON.parse(sessionStorage.getItem(CACHE_KEY)||'null');return x&&x.userId===uid&&Date.now()-x.savedAt<CACHE_MS?x.state:null}catch{return null}}
 function writeCache(s){try{sessionStorage.setItem(CACHE_KEY,JSON.stringify({userId:s.user.id,savedAt:Date.now(),state:{user:s.user,profile:s.profile||null,roles:s.roles||[],permissions:s.permissions||[]}}))}catch{}}
@@ -23,6 +23,7 @@ async function remote(session){
 }
 function publish(s){document.getElementById('nd-auth-loading')?.remove();document.documentElement.classList.remove('nd-auth-pending');window.NONDOT_AUTH_STATE=s;window.dispatchEvent(new CustomEvent('nondot:authenticated',{detail:s}))}
 async function requireAuth(){showLoading();try{let {data,error}=await client().auth.getSession();if(error)throw error;let session=data?.session;if(!session?.access_token){clearCache();location.replace('nondot-login.html');return null}const cached=readCache(session.user.id);const s=cached?{...cached,session,user:session.user}:await remote(session);publish(s);return s}catch(e){console.error('[NON-DOT Auth]',e);clearCache();showError(e?.message||'Unable to verify your management session.');return null}}
-async function signOut(){clearCache();try{await client().auth.signOut({scope:'local'})}finally{location.replace('nondot-login.html')}}
-window.NONDOTAuth=Object.freeze({requireAuth,signOut,clearCache});
+async function revalidate(){try{const {data,error}=await client().auth.getSession();if(error||!data?.session?.access_token)throw error||new Error('Session expired.');const s=await remote(data.session);publish(s);return s}catch(e){clearCache();throw e}}
+async function signOut(){clearCache();try{localStorage.setItem('s4u-nondot-admin-logout-v1',JSON.stringify({at:Date.now(),reason:'manual'}))}catch{}try{await client().auth.signOut({scope:'local'})}finally{location.replace('nondot-login.html')}}
+window.NONDOTAuth=Object.freeze({requireAuth,revalidate,signOut,clearCache});
 })();

@@ -46,37 +46,3 @@
 .proposal-custom-note h2{margin:0 0 14px!important;font-size:24px!important;line-height:1.2!important;color:var(--ink)!important}
 .proposal-custom-note p{margin:0!important;font-size:15px!important;line-height:1.8!important;color:#526b87!important;white-space:pre-wrap!important}
 @media(max-width:640px){.proposal-custom-note{margin:0!important;padding:24px 22px!important}}
-
-/* 2026-10-07: Keep proposal pricing columns readable on desktop. */
-@media(min-width:781px){
-  .proposal-pricing{table-layout:fixed}
-  .proposal-pricing th:nth-child(1),.proposal-pricing td:nth-child(1){width:68%}
-  .proposal-pricing th:nth-child(2),.proposal-pricing td:nth-child(2){width:12%;white-space:nowrap}
-  .proposal-pricing th:nth-child(3),.proposal-pricing td:nth-child(3){width:8%;white-space:nowrap;text-align:center}
-  .proposal-pricing th:nth-child(4),.proposal-pricing td:nth-child(4){width:12%;white-space:nowrap;text-align:right}
-  .proposal-pricing td:first-child{padding-right:24px}
-}
-
-
-.proposal-print-logo{display:none}
-@media print{
-  .proposal-print-logo{
-    display:block!important;
-    width:220px!important;
-    max-width:220px!important;
-    height:auto!important;
-    margin:0 0 18px!important;
-    filter:none!important;
-    -webkit-print-color-adjust:exact!important;
-    print-color-adjust:exact!important;
-  }
-  .proposal-logo,
-  .proposal-header img,
-  .proposal-brand img{
-    display:none!important;
-  }
-  *{
-    -webkit-print-color-adjust:exact!important;
-    print-color-adjust:exact!important;
-  }
-}
