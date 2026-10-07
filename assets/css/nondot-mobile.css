@@ -108,7 +108,7 @@ input,select,textarea,button{max-width:100%}
   .proposal-section,.proposal-company{padding:24px 18px!important}
   .proposal-section h2{font-size:21px!important}
   .proposal-section p{font-size:14px!important;line-height:1.7!important}
-  .proposal-custom-note{margin:14px 18px!important;padding:17px 16px!important}
+  .proposal-custom-note{margin:0!important;padding:24px 18px!important;border-radius:0!important;background:#fff!important;border-left:0!important}
   .proposal-meta{grid-template-columns:1fr!important}
   .proposal-meta-card{min-height:0!important}
   .proposal-pricing{font-size:13px}

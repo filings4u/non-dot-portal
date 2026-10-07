@@ -30,4 +30,19 @@
   .proposal-section,.proposal-company{padding-left:22px;padding-right:22px}
 }
 
-.proposal-custom-note{margin:20px 46px;padding:20px 22px!important;border:1px solid #f2c8aa!important;border-left:4px solid #f05a00!important;border-radius:10px;background:#fffaf6}.proposal-custom-note h2{color:#17365f}.proposal-custom-note p{color:#526b87}@media(max-width:780px){.proposal-custom-note{margin-left:24px;margin-right:24px}}@media(max-width:520px){.proposal-custom-note{margin-left:19px;margin-right:19px}}
+
+
+/* 2026-10-07: Billing and post-approval notes visually match the Terms section. */
+.proposal-custom-note{
+  margin:0!important;
+  padding:34px 46px!important;
+  border:0!important;
+  border-top:1px solid #e8edf4!important;
+  border-left:0!important;
+  border-radius:0!important;
+  background:#fff!important;
+  box-shadow:none!important;
+}
+.proposal-custom-note h2{margin:0 0 14px!important;font-size:24px!important;line-height:1.2!important;color:var(--ink)!important}
+.proposal-custom-note p{margin:0!important;font-size:15px!important;line-height:1.8!important;color:#526b87!important;white-space:pre-wrap!important}
+@media(max-width:640px){.proposal-custom-note{margin:0!important;padding:24px 22px!important}}
