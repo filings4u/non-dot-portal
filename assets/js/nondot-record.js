@@ -48,7 +48,7 @@ async function load(){
    renderCustomer(bundle);return;
  }
  let row={};
- if(!isNew){if(c.siteKey){const d=await NONDOTApi.read('website_management');row=(d[c.siteKey]||[]).find(x=>x.id===id)||{}}else{const d=await NONDOTApi.read(c.read);row=(d[c.key]||[]).find(x=>x.id===id)||{}}}
+ if(!isNew){if(module==='support'){const d=await NONDOTApi.read('support_detail',{id});renderSupport(d);return}else if(c.siteKey){const d=await NONDOTApi.read('website_management');row=(d[c.siteKey]||[]).find(x=>x.id===id)||{}}else{const d=await NONDOTApi.read(c.read);row=(d[c.key]||[]).find(x=>x.id===id)||{}}}
  render(row)
 }
 
@@ -136,6 +136,15 @@ function renderCustomer(bundle){
      message(msg,true);
    }
  };
+}
+
+function renderSupport(bundle){
+ const t=bundle.ticket||{},messages=bundle.messages||[],attachments=bundle.attachments||[],byMessage=new Map(),ticketFiles=[];
+ for(const a of attachments){if(a.message_id){if(!byMessage.has(a.message_id))byMessage.set(a.message_id,[]);byMessage.get(a.message_id).push(a)}else ticketFiles.push(a)}
+ const files=xs=>xs.length?`<div class="nd-support-files">${xs.map(a=>`<button class="nd-btn small" type="button" data-support-file="${esc(a.id)}">Open: ${esc(a.file_name||'Attachment')}</button>`).join('')}</div>`:'';
+ $('#ndPageMount').innerHTML=`<section class="nd-page"><div class="nd-page-head"><div><span class="nd-eyebrow">WORKFORCE NON-DOT MANAGEMENT</span><h1>Support Ticket</h1><p>${esc(t.ticket_number||'Ticket')} · ${esc(t.subject||'')}</p></div><div class="nd-actions"><a class="nd-btn" href="nondot-support.html">Back</a></div></div><div id="recordMessage" class="nd-page-message" hidden></div><div class="nd-grid"><div class="nd-card" style="grid-column:span 8"><div class="nd-card-head"><div><h2>Conversation</h2><p>Employer and Workforce NON-DOT support messages.</p></div></div><div class="nd-card-body">${files(ticketFiles)}<div class="nd-support-thread">${messages.length?messages.map(m=>`<article class="nd-support-message ${m.sender_type==='staff'?'staff':'customer'}"><div><strong>${m.sender_type==='staff'?'Workforce NON-DOT Staff':'Employer'}</strong><small>${esc(dt(m.created_at))}</small></div><p>${esc(m.body||'')}</p>${files(byMessage.get(m.id)||[])}</article>`).join(''):`<article class="nd-support-message customer"><div><strong>Employer</strong><small>${esc(dt(t.created_at))}</small></div><p>${esc(t.message||'')}</p></article>`}</div></div></div><div class="nd-card third"><div class="nd-card-head"><div><h2>Ticket Controls</h2><p>Update status, priority, and reply.</p></div></div><div class="nd-card-body"><form id="supportManagementForm"><div class="nd-field-grid">${field('status','Status',t.status||'open','select',[['open','Open'],['in_progress','In Progress'],['waiting_customer','Waiting on Customer'],['resolved','Resolved'],['closed','Closed']])}${field('priority','Priority',t.priority||'normal','select',[['low','Low'],['normal','Normal'],['high','High'],['urgent','Urgent']])}${field('reply','Staff Reply','','textarea',[],true)}</div><div class="nd-form-actions"><button class="nd-btn primary" type="submit">Save / Send Reply</button></div></form></div></div></div></section>`;
+ document.querySelectorAll('[data-support-file]').forEach(b=>b.onclick=async()=>{try{const d=await NONDOTApi.write('support_attachment_url',{attachment_id:b.dataset.supportFile});window.open(d.url,'_blank','noopener,noreferrer')}catch(e){message(e.message,true)}});
+ $('#supportManagementForm').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.currentTarget).entries());try{await NONDOTApi.write('update_support_ticket',{ticket_id:id,status:f.status,priority:f.priority});if(f.reply?.trim())await NONDOTApi.write('support_reply',{ticket_id:id,message:f.reply.trim(),status:f.status});message('Support ticket updated.');setTimeout(()=>load(),300)}catch(err){message(err.message,true)}};
 }
 
 function render(row){
