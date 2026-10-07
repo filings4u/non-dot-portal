@@ -1,3 +1,36 @@
 
 .nd-proposal-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.nd-proposal-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:18px}.nd-proposal-summary .nd-metric{min-height:100px}.nd-proposal-list-actions{display:flex;gap:7px;flex-wrap:wrap}.nd-proposal-editor-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.55fr);gap:18px;align-items:start}.nd-proposal-editor-main,.nd-proposal-editor-side{display:grid;gap:18px}.nd-proposal-section-row{border:1px solid #d9e3ef;border-radius:12px;padding:16px;background:#fff}.nd-proposal-section-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}.nd-proposal-section-head input{font-weight:800}.nd-proposal-section-actions{margin-left:auto;display:flex;gap:6px}.nd-proposal-pricing-table input,.nd-proposal-pricing-table select{min-width:90px}.nd-proposal-price-total{display:grid;grid-template-columns:1fr auto;gap:8px 18px;padding:16px;border-top:1px solid #e4ebf4}.nd-proposal-price-total strong{font-size:18px}.nd-proposal-library{display:grid;gap:8px}.nd-proposal-library button{text-align:left}.nd-preview-paper{max-width:980px;margin:0 auto;background:#fff;border:1px solid #dce5f0;border-radius:16px;overflow:hidden;box-shadow:0 18px 48px rgba(23,54,95,.08)}.nd-preview-brand{background:#17365f;padding:24px 30px}.nd-preview-brand img{max-width:340px;max-height:72px}.nd-preview-body{padding:34px}.nd-preview-kicker{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:#f05a00}.nd-preview-body h1{font-size:36px;line-height:1.08;margin:8px 0 10px}.nd-preview-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}.nd-preview-meta div,.nd-preview-price-card{border:1px solid #dce5f0;border-radius:12px;padding:14px}.nd-preview-section{padding:22px 0;border-top:1px solid #e3eaf2}.nd-preview-section h2{font-size:22px;margin:0 0 8px}.nd-preview-section p{white-space:pre-wrap;line-height:1.7;color:#536b86}.nd-preview-items{width:100%;border-collapse:collapse}.nd-preview-items th,.nd-preview-items td{padding:12px;border-bottom:1px solid #e5ebf2;text-align:left}.nd-preview-items th:last-child,.nd-preview-items td:last-child{text-align:right}.nd-preview-company{margin-top:26px;padding-top:18px;border-top:1px solid #e4eaf2;color:#687d95;font-size:12px;line-height:1.6}.nd-inline-note{padding:12px 14px;border-radius:9px;background:#eef5ff;color:#1d4f87}.nd-inline-note.error{background:#fff1ef;color:#a63f32}.nd-inline-note.success{background:#eff9f2;color:#267446}@media(max-width:1100px){.nd-proposal-summary{grid-template-columns:repeat(2,1fr)}.nd-proposal-editor-grid{grid-template-columns:1fr}.nd-preview-meta{grid-template-columns:1fr}}@media(max-width:640px){.nd-proposal-summary{grid-template-columns:1fr}.nd-preview-body{padding:22px}.nd-preview-body h1{font-size:28px}}
 @media print{.nd-sidebar,.nd-topbar,.nd-page-head,.nd-proposal-toolbar{display:none!important}.nd-main,.nd-content{margin:0!important;padding:0!important}.nd-preview-paper{max-width:none;border:0;box-shadow:none;border-radius:0}.nd-preview-body{padding:26px}.nd-preview-brand{padding:18px 26px}}
+
+/* Proposal editor usability fixes */
+.nd-proposal-editor-main,.nd-proposal-editor-side,.nd-proposal-section-row,.nd-proposal-section-head{min-width:0}
+.nd-proposal-section-row{display:block;padding:16px 18px}
+.nd-proposal-section-head{width:100%;align-items:flex-start}
+.nd-proposal-section-head>input{flex:1 1 auto;width:100%;min-width:0;max-width:none;min-height:42px;padding:9px 11px;border:1px solid #cfd9e6;border-radius:8px;background:#fff;color:#17365f;font:inherit;font-weight:800}
+.nd-proposal-section-row>textarea{display:block;width:100%!important;max-width:none!important;min-width:0!important;min-height:170px;padding:12px 13px;border:1px solid #cfd9e6;border-radius:8px;background:#fff;color:#26384d;font:inherit;font-size:13px;line-height:1.62;resize:vertical}
+.nd-proposal-section-head>input:focus,.nd-proposal-section-row>textarea:focus{outline:none;border-color:#6f97ca;box-shadow:0 0 0 3px rgba(36,70,127,.08)}
+.nd-proposal-pricing-table{min-width:900px}
+.nd-proposal-pricing-table td:first-child{min-width:300px}
+.nd-proposal-item-name,.nd-proposal-item-desc{width:100%;max-width:none;min-width:0}
+.nd-proposal-item-name{min-height:38px;font-weight:800}
+.nd-proposal-item-desc{margin-top:6px;min-height:58px;resize:vertical}
+.nd-proposal-mini-field{display:grid;gap:4px;min-width:105px}
+.nd-proposal-mini-field span{font-size:9px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:#788aa0}
+.nd-proposal-mini-field input{width:110px!important;min-width:0!important}
+.nd-proposal-unit-tag{display:inline-flex;margin-top:6px;padding:3px 7px;border-radius:999px;background:#eef4fb;color:#56708f;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.nd-proposal-catalog-search{display:grid;gap:6px;margin-bottom:12px}
+.nd-proposal-catalog-search span{font-size:9px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#6e7f94}
+.nd-proposal-catalog-search input{width:100%;min-width:0;min-height:40px;border:1px solid #d3deea;border-radius:8px;padding:0 11px;background:#fff;color:#17365f}
+.nd-proposal-catalog-groups{display:grid;gap:16px;max-height:720px;overflow:auto;padding-right:3px}
+.nd-proposal-catalog-group{display:grid;gap:7px}
+.nd-proposal-catalog-group h3{position:sticky;top:0;z-index:1;margin:0;padding:7px 4px;background:#fff;color:#6a7d94;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.nd-proposal-service-button{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;text-align:left;padding:11px 12px;border:1px solid #d5e0ec;border-radius:9px;background:#fff;color:#17365f;cursor:pointer;transition:.15s ease}
+.nd-proposal-service-button:hover{border-color:#8fb0d8;background:#f8fbff;box-shadow:0 6px 16px rgba(16,38,74,.06);transform:translateY(-1px)}
+.nd-proposal-service-button:active{transform:translateY(0)}
+.nd-proposal-service-button span{min-width:0;display:grid;gap:3px}
+.nd-proposal-service-button strong{font-size:11px;line-height:1.25;color:#17427a}
+.nd-proposal-service-button small{display:block;color:#7a8ba0;font-size:9px;line-height:1.35;white-space:normal}
+.nd-proposal-service-button b{white-space:nowrap;color:#f05a00;font-size:10px}
+.nd-proposal-item-added{animation:proposalItemAdded 1.6s ease}
+@keyframes proposalItemAdded{0%,35%{background:#fff5e9;box-shadow:inset 4px 0 #f05a00}100%{background:transparent;box-shadow:none}}
+@media(max-width:1100px){.nd-proposal-section-row>textarea{min-height:150px}.nd-proposal-catalog-groups{max-height:520px}}
