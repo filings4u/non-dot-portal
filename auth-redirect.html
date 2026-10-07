@@ -1,11 +1,14 @@
 <!doctype html>
 <html lang="en">
-<head><meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex"><meta name="googlebot" content="noindex,nofollow,noarchive,nosnippet,noimageindex"><meta name="bingbot" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+<head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#173e6b">
   <title>Choose Your screenings4u Portal</title>
+  <link rel="preconnect" href="https://employer-non-dot.screenings4u.com" crossorigin>
+  <link rel="preconnect" href="https://ctpa-non-dot.screenings4u.com" crossorigin>
+  <link rel="preconnect" href="https://elpbnytpciqnbexiaebp.supabase.co" crossorigin>
   <link rel="icon" href="/images/fav.png">
   <style>
     :root{
@@ -61,7 +64,7 @@
       .error{margin:0 16px 16px}
     }
   </style>
-<link rel="stylesheet" href="assets/css/nondot-mobile.css?v=20261007-mobile1"></head>
+</head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
@@ -127,6 +130,34 @@
   const hash=location.hash || '';
   const params=new URLSearchParams(hash.startsWith('#')?hash.slice(1):hash);
   const accessToken=params.get('access_token') || '';
+  const ROUTE_CACHE_PREFIX='s4u_portal_route_v2:';
+  const ROUTE_CACHE_TTL=7*24*60*60*1000;
+
+  function jwtUserId(token){
+    try{
+      const part=token.split('.')[1];
+      if(!part)return '';
+      const json=JSON.parse(atob(part.replace(/-/g,'+').replace(/_/g,'/')));
+      return String(json.sub||'');
+    }catch{return ''}
+  }
+  const sessionUserId=jwtUserId(accessToken);
+
+  function routeCacheKey(){
+    return sessionUserId ? ROUTE_CACHE_PREFIX+sessionUserId : '';
+  }
+  function readCachedRoute(){
+    const key=routeCacheKey(); if(!key)return null;
+    try{
+      const x=JSON.parse(localStorage.getItem(key)||'null');
+      if(!x||!x.url||Date.now()-Number(x.saved_at||0)>ROUTE_CACHE_TTL)return null;
+      return x;
+    }catch{return null}
+  }
+  function saveCachedRoute(dest){
+    const key=routeCacheKey(); if(!key||!dest||!dest.url)return;
+    try{localStorage.setItem(key,JSON.stringify({url:dest.url,label:dest.label||'',saved_at:Date.now()}))}catch{}
+  }
 
   const statusTitle=document.getElementById('statusTitle');
   const statusText=document.getElementById('statusText');
@@ -149,8 +180,9 @@
     directoryGrid.classList.remove('hidden');
   }
 
-  function forward(url){
+  function forward(url,label){
     if(!safeDest(url)){showError('The portal destination could not be verified.');return}
+    saveCachedRoute({url,label:label||''});
     location.replace(url + hash);
   }
 
@@ -173,6 +205,7 @@
       const a=document.createElement('a');
       a.className='portal'+(i===0?' primary':'');
       a.href=d.url+hash;
+      a.addEventListener('click',()=>saveCachedRoute(d),{once:true});
       a.innerHTML='<strong></strong><span>Open this portal</span>';
       a.querySelector('strong').textContent=d.label||'screenings4u Portal';
       authorizedGrid.appendChild(a);
@@ -182,6 +215,17 @@
 
   if(!accessToken){
     showDirectory('Sign in through the portal for your screenings4u service.');
+    return;
+  }
+
+  // Fast path: if this same authenticated user previously resolved to one portal,
+  // go there immediately. The destination portal still validates the session and
+  // entitlement, so this only removes repeat selector latency.
+  const cachedRoute=readCachedRoute();
+  if(cachedRoute && safeDest(cachedRoute.url)){
+    statusTitle.textContent='Opening your portal…';
+    statusText.textContent=cachedRoute.label||'Your screenings4u portal';
+    location.replace(cachedRoute.url + hash);
     return;
   }
 
@@ -200,7 +244,7 @@
     if(destinations.length===1){
       statusTitle.textContent='Opening your portal…';
       statusText.textContent=destinations[0].label||'Your screenings4u portal';
-      forward(destinations[0].url);
+      forward(destinations[0].url,destinations[0].label);
       return;
     }
     if(destinations.length>1){
