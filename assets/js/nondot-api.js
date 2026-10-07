@@ -8,5 +8,6 @@ const read=(action,extra={})=>invoke(cfg().managementReadFunction,{action,...ext
 const write=(action,payload={})=>invoke(cfg().managementWriteFunction,{action,...payload});
 const extended=(action,payload={})=>invoke(cfg().extendedWriteFunction,{action,...payload});
 const portalAccess=(action,payload={})=>invoke(cfg().portalAccessFunction,{action,...payload});
-window.NONDOTApi=Object.freeze({read,write,extended,portalAccess,invoke});
+const proposals=(action,payload={})=>invoke(cfg().proposalFunction,{action,...payload});
+window.NONDOTApi=Object.freeze({read,write,extended,portalAccess,proposals,invoke});
 })();

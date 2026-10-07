@@ -12,6 +12,7 @@
     managementWriteFunction:"nondot-management-actions",
     extendedWriteFunction:"nondot-management-actions",
     portalAccessFunction:"nondot-portal-control",
+    proposalFunction:"nondot-proposal-management",
     storageKey:"s4u-nondot-management-session"
   });
   window.NONDOT_PORTAL_CONFIG=config;

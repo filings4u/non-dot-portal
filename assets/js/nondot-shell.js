@@ -4,6 +4,7 @@
 const page=location.pathname.split('/').pop()||'nondot-dashboard.html';
 const groups=[
  ['Control Center',[['nondot-dashboard.html','Overview','⌂'],['nondot-website.html','NON-DOT Website','◫'],['nondot-portal-control.html','Portal Control','◎']]],
+ ['Sales',[['nondot-proposals.html','Proposals','✦']]],
  ['Customers',[['nondot-ctpas.html','C/TPAs','◈'],['nondot-employers.html','Employers','▣'],['nondot-people.html','People','◉'],['nondot-users-access.html','Users & Access','♙']]],
  ['Programs & Testing',[['nondot-programs.html','Programs','≡'],['nondot-pools.html','Pools','⊙'],['nondot-selections.html','Random Selections','⌁'],['nondot-testing.html','Testing Orders','✚'],['nondot-results.html','Results','✓']]],
  ['Compliance & Records',[['nondot-compliance.html','Compliance Cases','⚑'],['nondot-documents.html','Documents','▱'],['nondot-services.html','Services & Catalog','$']]],
