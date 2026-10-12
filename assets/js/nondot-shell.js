@@ -3,12 +3,21 @@
 "use strict";
 const page=location.pathname.split('/').pop()||'nondot-dashboard.html';
 const groups=[
- ['Control Center',[['nondot-dashboard.html','Overview','⌂'],['nondot-website.html','NON-DOT Website','◫'],['nondot-portal-control.html','Portal Control','◎']]],
- ['Sales',[['nondot-proposals.html','Proposals','✦']]],
- ['Customers',[['nondot-ctpas.html','C/TPAs','◈'],['nondot-employers.html','Employers','▣'],['nondot-people.html','People','◉'],['nondot-users-access.html','Users & Access','♙']]],
+ ['Control Center',[['nondot-dashboard.html','Overview','⌂'],['nondot-website.html','NON-DOT Website','◫'],['nondot-portal-control.html','Portal Control','◎'],['nondot-portal-domains.html','Portal Domains','⇧']]],
+
+ ['Customers',[['nondot-ctpas.html','C/TPAs','◈'],['nondot-employers.html','Employers','▣'],['nondot-people.html','People','◉'],['nondot-users-access.html','Users & Access','♙'],['nondot-proposals.html','Proposals','✦']]],
  ['Programs & Testing',[['nondot-programs.html','Programs','≡'],['nondot-pools.html','Pools','⊙'],['nondot-selections.html','Random Selections','⌁'],['nondot-testing.html','Testing Orders','✚'],['nondot-results.html','Results','✓']]],
- ['Compliance & Records',[['nondot-compliance.html','Compliance Cases','⚑'],['nondot-documents.html','Documents','▱'],['nondot-services.html','Services & Catalog','$']]],
- ['Commerce',[['nondot-billing.html','Billing','▧'],['nondot-reports.html','Reports','☷']]],
+ ['Compliance',[['nondot-compliance.html','Compliance Cases','⚑']]],
+ ['Commerce & Records',[['nondot-services.html','Website Plans & Pricing','
+ ['Administration',[['nondot-notifications.html','Notifications','●'],['nondot-integrations.html','Integrations','⌘'],['nondot-support.html','Support','?'],['nondot-staff.html','Staff','♟'],['nondot-settings.html','Settings','⚙']]]
+];
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const initials=v=>String(v||'ND').split(/\s+|@/).filter(Boolean).slice(0,2).map(x=>x[0]?.toUpperCase()).join('')||'ND';
+function nav(){return groups.map(([label,links])=>`<div class="nd-nav-group"><span>${esc(label)}</span>${links.map(([href,name,icon])=>`<a href="${href}" class="${page===href?'active':''}"><i class="nd-nav-icon">${icon}</i><b>${esc(name)}</b></a>`).join('')}</div>`).join('')}
+function render(state){const p=state?.profile||{},u=state?.user||{},name=p.display_name||[p.first_name,p.last_name].filter(Boolean).join(' ')||u.email||'Administrator',role=(state?.roles||[])[0]||'staff';document.body.innerHTML=`<div class="nd-app"><aside class="nd-sidebar"><div class="nd-brand"><a href="nondot-dashboard.html"><img class="nd-brand-logo" src="images/logo.png" alt="Workforce NON-DOT by screenings4u"></a></div><nav class="nd-nav">${nav()}</nav></aside><div class="nd-main"><header class="nd-topbar"><div class="nd-topbar-left"><button class="nd-menu-button" id="ndMenu">☰</button><button class="nd-sidebar-toggle" id="ndSidebarToggle">◀</button><div class="nd-topbar-title"><strong>NON-DOT Management</strong></div></div><div class="nd-topbar-actions"><a class="nd-icon-button" href="nondot-notifications.html">●</a><a class="nd-icon-button" href="nondot-support.html">?</a><button class="nd-user-button" id="ndUser" type="button"><span class="nd-avatar">${esc(initials(name))}</span><span class="nd-user-copy"><strong>${esc(name)}</strong><small>${esc(role)}</small></span></button></div></header><main id="ndPageMount"></main></div></div><div class="nd-overlay" id="ndOverlay"></div>`;document.getElementById('ndMenu')?.addEventListener('click',()=>document.body.classList.add('nd-menu-open'));document.getElementById('ndOverlay')?.addEventListener('click',()=>document.body.classList.remove('nd-menu-open'));document.getElementById('ndUser')?.addEventListener('click',()=>window.NONDOTAuth.signOut());const saved=localStorage.getItem('nondot-sidebar-collapsed')==='1';if(saved)document.body.classList.add('nd-sidebar-collapsed');const t=document.getElementById('ndSidebarToggle');const sync=()=>{const c=document.body.classList.contains('nd-sidebar-collapsed');if(t)t.textContent=c?'▶':'◀'};sync();t?.addEventListener('click',()=>{document.body.classList.toggle('nd-sidebar-collapsed');localStorage.setItem('nondot-sidebar-collapsed',document.body.classList.contains('nd-sidebar-collapsed')?'1':'0');sync()})}
+window.NONDOTShell=Object.freeze({render,groups,escape:esc});
+})();
+],['nondot-billing.html','Billing','▧'],['nondot-documents.html','Documents','▱'],['nondot-reports.html','Reports','☷']]],
  ['Administration',[['nondot-notifications.html','Notifications','●'],['nondot-integrations.html','Integrations','⌘'],['nondot-portal-domains.html','Portal Domains','◎'],['nondot-support.html','Support','?'],['nondot-staff.html','Staff','♟'],['nondot-settings.html','Settings','⚙']]]
 ];
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
